@@ -79,7 +79,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_3);
+
     /* USER CODE END WHILE */
 
 //	#if POLLING
@@ -183,8 +183,9 @@ void proccesDmaData(const uint8_t* sign,int pos)
 
 		  			if(strcmp(rx_data,prikaz1)==0 && equals(rx_data,prikaz1)){
 		  				sendUsart2Buffer(1);
-
+		  				LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
 		  			}else if (strcmp(rx_data,prikaz2)==0 && equals(rx_data,prikaz2)){
+		  				LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
 		  				sendUsart2Buffer(0);
 		  			}
 		  			memset(&rx_data[0], 0, sizeof(rx_data));
