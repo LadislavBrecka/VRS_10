@@ -68,12 +68,13 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
+  USART2_RegisterCallback(proccesDmaData);
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   /* Space for your local variables, callback registration ...*/
 
-  USART2_RegisterCallback(proccesDmaData);
+
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -183,9 +184,9 @@ void proccesDmaData(const uint8_t* sign,int pos)
 
 		  			if(strcmp(rx_data,prikaz1)==0 && equals(rx_data,prikaz1)){
 		  				sendUsart2Buffer(1);
-		  				LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
+		  				//LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
 		  			}else if (strcmp(rx_data,prikaz2)==0 && equals(rx_data,prikaz2)){
-		  				LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
+		  				//LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
 		  				sendUsart2Buffer(0);
 		  			}
 		  			memset(&rx_data[0], 0, sizeof(rx_data));

@@ -241,6 +241,21 @@ void USART2_IRQHandler(void)
 	}
 }
 /* USER CODE BEGIN 1 */
+void TIM2_IRQHandler(void)
+{
+	if(LL_TIM_IsActiveFlag_UPDATE(TIM2))
+	{
+		if(LL_GPIO_IsOutputPinSet(GPIOA, LL_GPIO_PIN_5))
+			{
+				LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
+			}
+			else
+			{
+				LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
+			}
+	}
 
+	LL_TIM_ClearFlag_UPDATE(TIM2);
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
