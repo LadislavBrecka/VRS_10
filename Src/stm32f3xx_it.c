@@ -59,7 +59,8 @@
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
-
+static uint8_t value = 0;
+uint8_t state = 0;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -68,6 +69,7 @@
 /**
   * @brief This function handles Non maskable interrupt.
   */
+
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
@@ -243,10 +245,16 @@ void USART2_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 void TIM2_IRQHandler(void)
 {
-	//LL_TIM_OC_SetCompareCH1(TIM2, 30000);
+	//LL_TIM_OC_SetCompareCH1(TIM2, 0);
 	if(LL_TIM_IsActiveFlag_UPDATE(TIM2))
 	{
 
+		   if(value > 99)
+		        state = 1;
+		    else if (value <= 0)
+		        state = 0;
+
+		LL_TIM_OC_SetCompareCH1(TIM2, value);
 
 //		if(LL_GPIO_IsOutputPinSet(GPIOA, LL_GPIO_PIN_7))
 //			{
@@ -256,7 +264,10 @@ void TIM2_IRQHandler(void)
 //			{
 //				LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_7);
 //			}
-
+		   if(!state)
+		        value++;
+		    else
+		        value--;
 	}
 
 	LL_TIM_ClearFlag_UPDATE(TIM2);

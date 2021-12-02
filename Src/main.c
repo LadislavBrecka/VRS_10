@@ -185,6 +185,7 @@ void proccesDmaData(const uint8_t* sign,int pos)
 		  			if(strcmp(rx_data,prikaz1)==0 && equals(rx_data,prikaz1)){
 		  				sendUsart2Buffer(1);
 		  				//LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
+
 		  			}else if (strcmp(rx_data,prikaz2)==0 && equals(rx_data,prikaz2)){
 		  				//LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
 		  				sendUsart2Buffer(0);

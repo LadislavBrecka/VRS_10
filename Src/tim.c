@@ -47,18 +47,18 @@ void MX_TIM2_Init(void)
 
 	  //LL_TIM_DisableARRPreload(TIM3);
 	  LL_TIM_EnableARRPreload(TIM2);
-	  LL_TIM_SetClockSource(TIM2, LL_TIM_CHANNEL_CH1);
+	  LL_TIM_OC_EnablePreload(TIM2, LL_TIM_CHANNEL_CH1);
 	  TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM1;
 	  TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
 	  TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-	  TIM_OC_InitStruct.CompareValue = 50;
+	  TIM_OC_InitStruct.CompareValue = 0;
 	  TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
 	  LL_TIM_OC_Init(TIM2 , LL_TIM_CHANNEL_CH1, &TIM_OC_InitStruct);
 	  LL_TIM_OC_DisableFast(TIM2, LL_TIM_CHANNEL_CH1);
 
 	  LL_TIM_SetTriggerOutput(TIM2, LL_TIM_TRGO_RESET);
 	  LL_TIM_DisableMasterSlaveMode(TIM2);
-
+	  LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH1);
 	 // LL_TIM_OC_EnablePreload(TIM3,LL_TIM_CHANNEL_CH1);
 
 	  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
@@ -72,9 +72,9 @@ void MX_TIM2_Init(void)
 	  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
 	  GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
 	  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
 	  LL_TIM_EnableIT_UPDATE(TIM2);
 	  LL_TIM_EnableCounter(TIM2);
+
 
 }
 
