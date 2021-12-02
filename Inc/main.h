@@ -61,7 +61,8 @@ void Error_Handler(void);
                                                                  0 bit  for subpriority */
 #endif
 
-
+void writeCCR();
+void setDutyCycle(uint8_t D);
 /* Structure data type to store amount of small and capital letters. */
 typedef struct
 {

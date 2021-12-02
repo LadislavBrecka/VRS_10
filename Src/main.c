@@ -47,6 +47,8 @@ uint8_t rx_data[35];
 uint8_t id = 0;
 uint8_t start = 0;
 uint8_t mode = 0;
+static uint8_t value = 0;
+uint8_t state = 1;
 
 int main(void)
 {
@@ -184,11 +186,11 @@ void proccesDmaData(const uint8_t* sign,int pos)
 
 		  			if(strcmp(rx_data,prikaz1)==0 && equals(rx_data,prikaz1)){
 		  				sendUsart2Buffer(1);
-		  				//LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
+		  				mode = 1;
 
 		  			}else if (strcmp(rx_data,prikaz2)==0 && equals(rx_data,prikaz2)){
-		  				//LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
 		  				sendUsart2Buffer(0);
+		  				mode = 0;
 		  			}
 		  			memset(&rx_data[0], 0, sizeof(rx_data));
 		  			start=0;
@@ -206,6 +208,30 @@ void proccesDmaData(const uint8_t* sign,int pos)
 			}
 
 	    }
+}
+
+void writeCCR() {
+	if (mode){
+		setDutyCycle(value);
+		if(value >= 99)
+			state = 1;
+		else if (value <= 0)
+			state = 0;
+
+	   if(!state)
+			value++;
+		else
+			value--;
+
+	} else {
+		value = 0;
+		state = 0;
+		setDutyCycle(value);
+	}
+}
+
+void setDutyCycle(uint8_t D) {
+	LL_TIM_OC_SetCompareCH1(TIM2, D);
 }
 
 
