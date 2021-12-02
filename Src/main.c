@@ -46,14 +46,14 @@ void proccesDmaData(const uint8_t* sign, int pos);
 uint8_t rx_data[35];
 uint8_t id = 0;
 uint8_t start = 0;
-uint8_t upper = 0;
-uint8_t lower = 0;
+uint8_t mode = 0;
+
 int main(void)
 {
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
   NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
@@ -76,15 +76,15 @@ LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
 	   * Example message (what I wish to see in terminal) - Buffer capacity: 1000 bytes, occupied memory: 231 bytes, load [in %]: 23.1%
 	   */
 
-	#if POLLING
-		//Polling for new data, no interrupts
-		USART2_CheckDmaReception();
-		LL_mDelay(10);
-	#else
-
-		USART2_PutBuffer(0,0);
-		LL_mDelay(200);
-	#endif
+//	#if POLLING
+//		//Polling for new data, no interrupts
+//		USART2_CheckDmaReception();
+//		LL_mDelay(10);
+//	#else
+//
+//		USART2_PutBuffer(0,0);
+//		LL_mDelay(200);
+//	#endif
   }
   /* USER CODE END 3 */
 }
@@ -121,6 +121,33 @@ void SystemClock_Config(void)
   LL_SetSystemCoreClock(8000000);
 }
 
+int equals(char firstStr[],char secondStr[])
+{
+    int i,result=1;
+    for(i=0; firstStr[i]!='\0' || secondStr[i]!='\0'; i++) {
+        if(firstStr[i] != secondStr[i]) {
+            result=0;
+            break;
+        }
+    }
+    return result;
+}
+
+
+
+void sendUsart2Buffer(int state){
+//state = 0 ->manual
+//state = 1 ->auto
+	uint8_t tx_data[] = "Selected mode: %s          \r\n";
+	uint8_t str[sizeof(tx_data)];
+	if(state == 1){
+		sprintf(str,tx_data,"auto");
+	}else{
+		sprintf(str,tx_data,"manual");
+	}
+
+	USART2_PutBuffer(str, sizeof(str));
+}
 
 
 /*
@@ -129,6 +156,10 @@ void SystemClock_Config(void)
 
 void proccesDmaData(const uint8_t* sign,int pos)
 {
+	  static const char prikaz1[] = "auto";
+	  static const char prikaz2[] = "manual";
+
+
 	  for(uint8_t i = 0; i < pos; i++)
 	    {
 		  uint8_t a = *(sign+i);
@@ -136,17 +167,15 @@ void proccesDmaData(const uint8_t* sign,int pos)
 		  		start=0;
 		  		id=0;
 		  	}else if(start == 1){
-		  		if(a=='$'){
-		  			for(uint8_t d = 0; d <= id; d++){
-		  				if (rx_data[d] >= 'A' && rx_data[d] <= 'Z') {
-		  				    // upper case
-		  					upper+=1;
-		  				} else if (rx_data[d] >= 'a' && rx_data[d] <= 'z') {
-		  				   // lower case
-		  					lower+=1;
-		  				}
-		  			}
 
+
+		  		if(a=='$'){
+
+		  			if(strcmp(rx_data,prikaz1)==0 && equals(rx_data,prikaz1)){
+		  				sendUsart2Buffer(1);
+		  			}else if (strcmp(rx_data,prikaz2)==0 && equals(rx_data,prikaz2)){
+		  				sendUsart2Buffer(0);
+		  			}
 		  			memset(&rx_data[0], 0, sizeof(rx_data));
 		  			start=0;
 		  			id=0;
@@ -157,11 +186,9 @@ void proccesDmaData(const uint8_t* sign,int pos)
 
 			}
 
-			if(a == '#')
+			if(a == '$')
 			{
 				start=1;
-				upper = 0;
-				lower = 0;
 			}
 
 	    }

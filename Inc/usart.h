@@ -36,7 +36,7 @@
 /* USER CODE END Private defines */
 
 void MX_USART2_UART_Init(void);
-void USART2_PutBuffer();
+void USART2_PutBuffer(uint8_t *buffer, uint8_t length);
 void USART2_CheckDmaReception(void);
 void USART2_RegisterCallback(void *callback);
 

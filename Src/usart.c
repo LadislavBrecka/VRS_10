@@ -133,20 +133,11 @@ void MX_USART2_UART_Init(void)
 
 
 // Send data stored in buffer with DMA
-void USART2_PutBuffer(){
+void USART2_PutBuffer(uint8_t *buffer, uint8_t length){
 
-	uint16_t pos = DMA_USART2_BUFFER_SIZE - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_6);
-	uint8_t tx_data[] = "Buffer capacity: %d bytes, occupied memory: %d bytes, load [in %%]: %.2f %%\r\n";
-	uint8_t str[sizeof(tx_data)];
-	sprintf(str,tx_data,DMA_USART2_BUFFER_SIZE,pos,(float)(100.0*pos/DMA_USART2_BUFFER_SIZE));
-
-
-	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_7, (uint32_t)str);
-
-	LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_7,  sizeof(str)-1);
-
+	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_7, (uint32_t)buffer);
+	LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_7, length);
 	LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_7);
-
 	LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_7);
 }
 
@@ -164,7 +155,6 @@ void USART2_CheckDmaReception(void)
 {
 	//prerobit
 	if(USART2_ProcessData == 0) return;
-
 
 		static uint16_t old_pos = 0;
 
