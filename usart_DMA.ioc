@@ -130,4 +130,3 @@ VP_SYS_VS_Systick.Signal=SYS_VS_Systick
 VP_TIM2_VS_no_output2.Mode=Output Compare2 No Output
 VP_TIM2_VS_no_output2.Signal=TIM2_VS_no_output2
 board=custom
-isbadioc=false

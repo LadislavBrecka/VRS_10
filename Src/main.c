@@ -50,7 +50,6 @@ uint8_t mode = 0;
 
 int main(void)
 {
-  /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
@@ -80,6 +79,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_3);
     /* USER CODE END WHILE */
 
 //	#if POLLING
@@ -91,6 +91,7 @@ int main(void)
 //		USART2_PutBuffer(0,0);
 //		LL_mDelay(200);
 //	#endif
+
   }
   /* USER CODE END 3 */
 }
@@ -182,6 +183,7 @@ void proccesDmaData(const uint8_t* sign,int pos)
 
 		  			if(strcmp(rx_data,prikaz1)==0 && equals(rx_data,prikaz1)){
 		  				sendUsart2Buffer(1);
+
 		  			}else if (strcmp(rx_data,prikaz2)==0 && equals(rx_data,prikaz2)){
 		  				sendUsart2Buffer(0);
 		  			}
