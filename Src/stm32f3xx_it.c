@@ -43,7 +43,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+ uint8_t state = 1;
+ uint8_t value = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -244,10 +245,33 @@ void USART2_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 void TIM2_IRQHandler(void)
 {
-	//LL_TIM_OC_SetCompareCH1(TIM2, 0);
 	if(LL_TIM_IsActiveFlag_UPDATE(TIM2))
 	{
-		writeCCR();
+		if(mode){
+			if(state){
+				value+=1;
+				if(value>=99){
+					value=99;
+					state^=1;
+				}
+			}else{
+				value-=1;
+				if(value<=0){
+					value=0;
+					state^=1;
+				}
+			}
+
+		}else{
+			if (value > manualValue) {
+				value-=1;
+			}else if(value < manualValue){
+				value+=1;
+			}else if(value == manualValue){
+				value = manualValue;
+			}
+		}
+		setDutyCycle(value);
 	}
 
 	LL_TIM_ClearFlag_UPDATE(TIM2);

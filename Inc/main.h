@@ -60,8 +60,8 @@ void Error_Handler(void);
 #define NVIC_PRIORITYGROUP_4         ((uint32_t)0x00000003) /*!< 4 bits for pre-emption priority,
                                                                  0 bit  for subpriority */
 #endif
-
-void writeCCR();
+extern uint8_t mode;
+extern uint8_t manualValue;
 void setDutyCycle(uint8_t D);
 /* Structure data type to store amount of small and capital letters. */
 typedef struct

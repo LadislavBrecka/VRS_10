@@ -46,9 +46,14 @@ void proccesDmaData(const uint8_t* sign, int pos);
 uint8_t rx_data[35];
 uint8_t id = 0;
 uint8_t start = 0;
-uint8_t mode = 0;
-static uint8_t value = 0;
-uint8_t state = 1;
+//external variables
+uint8_t mode = 1;
+uint8_t manualValue = 0;
+uint8_t internalmode = 1;
+
+
+static const char prikaz1[] = "auto";
+static const char prikaz2[] = "manual";
 
 int main(void)
 {
@@ -146,17 +151,49 @@ int equals(char firstStr[],char secondStr[])
     return result;
 }
 
+int equalsPWM(char str[])
+{
+	uint8_t prikaz[] = "PWMxx";
+	uint8_t i,result=1;
+    uint8_t num[3] ;
+    for(i=0; prikaz[i]!='\0' || str[i]!='\0'; i++) {
+
+        if(i<=2 && prikaz[i] != str[i]) {
+            result=0;
+            break;
+        }else if(i>2 && result==1){
+        	num[i-3]=str[i];
+        }
+    }
+
+
+    manualValue = atoi(num);
+    if(manualValue>99){
+    	manualValue = 99;
+    }else if(manualValue<0) {
+    	manualValue = 0;
+    }
+
+    return result;
+}
+
 
 
 void sendUsart2Buffer(int state){
 //state = 0 ->manual
 //state = 1 ->auto
-	uint8_t tx_data[] = "Selected mode: %s          \r\n";
-	uint8_t str[sizeof(tx_data)];
+	uint8_t tx_data[] = "Selected mode: %s\r\n";
+	uint8_t length = 0;
 	if(state == 1){
-		sprintf(str,tx_data,"auto");
+		length = sizeof(tx_data)+sizeof(prikaz1);
 	}else{
-		sprintf(str,tx_data,"manual");
+		length = sizeof(tx_data)+sizeof(prikaz2);
+	}
+	uint8_t str[length];
+	if(state == 1){
+		sprintf(str,tx_data,prikaz1);
+	}else{
+		sprintf(str,tx_data,prikaz2);
 	}
 
 	USART2_PutBuffer(str, sizeof(str));
@@ -169,9 +206,6 @@ void sendUsart2Buffer(int state){
 
 void proccesDmaData(const uint8_t* sign,int pos)
 {
-	  static const char prikaz1[] = "auto";
-	  static const char prikaz2[] = "manual";
-
 
 	  for(uint8_t i = 0; i < pos; i++)
 	    {
@@ -185,11 +219,13 @@ void proccesDmaData(const uint8_t* sign,int pos)
 		  		if(a=='$'){
 
 		  			if(strcmp(rx_data,prikaz1)==0 && equals(rx_data,prikaz1)){
-		  				sendUsart2Buffer(1);
 		  				mode = 1;
-
+		  				internalmode = mode;
+		  				sendUsart2Buffer(mode);
 		  			}else if (strcmp(rx_data,prikaz2)==0 && equals(rx_data,prikaz2)){
-		  				sendUsart2Buffer(0);
+		  				internalmode = 0;
+		  				sendUsart2Buffer(internalmode);
+		  			}else if(internalmode==0 && equalsPWM(rx_data)){
 		  				mode = 0;
 		  			}
 		  			memset(&rx_data[0], 0, sizeof(rx_data));
@@ -210,25 +246,17 @@ void proccesDmaData(const uint8_t* sign,int pos)
 	    }
 }
 
-void writeCCR() {
-	if (mode){
-		setDutyCycle(value);
-		if(value >= 99)
-			state = 1;
-		else if (value <= 0)
-			state = 0;
-
-	   if(!state)
-			value++;
-		else
-			value--;
-
-	} else {
-		value = 0;
-		state = 0;
-		setDutyCycle(value);
-	}
-}
+//void writeCCR() {
+//	if (mode){
+//		setDutyCycle(value);
+//
+//
+//	} else {
+//		value = 0;
+//		state = 0;
+//		setDutyCycle(value);
+//	}
+//}
 
 void setDutyCycle(uint8_t D) {
 	LL_TIM_OC_SetCompareCH1(TIM2, D);
